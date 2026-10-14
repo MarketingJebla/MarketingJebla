@@ -245,10 +245,7 @@ page({ path: "/gracias/", noindex: true, title: "¡Gracias! Recibimos tu solicit
 page({ path: "/404", noindex: true, title: "Página no encontrada | Chevrolet Jebla", desc: "La página que buscas no existe.",
   body: `<section class="phead phead--center"><div class="wrap"><h1 class="h1">No encontramos esta página</h1><p>Puede que el enlace haya cambiado. Te dejamos lo más buscado:</p><p class="btnrow"><a class="btn btn--primary" href="/modelos/">Ver modelos</a> <a class="btn btn--ghost" href="/">Ir al inicio</a></p></div></section>` });
 
-// expone utilidades para las secciones secundarias (build-secciones.mjs)
-export { page, leadForm, leadSection, field, chips, checks, trust, crumbs, crumbsLD, faqLD, faqSec, visit, waBand, modelOpts, ic, img, money, wa, telFmt, esc, dir, pages, OUT, catalog };
-
-if (existsSync("src/secciones.mjs")) (await import("./src/secciones.mjs")).buildSecciones();
+if (existsSync("src/secciones.mjs")) (await import("./src/secciones.mjs")).buildSecciones({ page, leadForm, leadSection, field, chips, checks, trust, crumbs, crumbsLD, faqLD, faqSec, visit, waBand, modelOpts, ic, img, money, wa, telFmt, esc, dir, muniOpts });
 
 // ---------- sitemap y robots ----------
 writeFileSync(OUT + "/robots.txt", SITE.preview ? "User-agent: *\nDisallow: /\n" : `User-agent: *\nAllow: /\n${SITE.url ? "Sitemap: " + abs("/sitemap.xml") + "\n" : ""}`);

@@ -510,3 +510,5 @@ a.mcard__img{display:grid}
 .mhero{min-height:calc(100svh - 150px - var(--dock-h))}
 @media (min-width:960px){.mhero{min-height:0}}
 .pbar{font-size:11px;padding:5px 8px}
+.pcard>*{min-width:0}
+@media (max-width:359px){.pcard{grid-template-columns:1fr}}

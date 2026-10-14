@@ -124,11 +124,12 @@
     if (next) next.addEventListener("click", function () {
       if (!validStep(1)) return;
       var v = form.querySelector('input[name="version"]:checked'), c = form.querySelector('input[name="color"]:checked');
-      var sum = [form.dataset.modelo || (form.modelo && form.modelo.value), v && v.value, c && c.value].filter(Boolean).join(" · ");
-      $("[data-summary]", form).textContent = (sum || "Cambiar") + " · cambiar";
+      var sum = [form.auto_actual && form.auto_actual.value, form.dataset.modelo || (form.modelo && form.modelo.value), v && v.value, c && c.value].filter(Boolean).join(" · ");
+      $("[data-summary]", form).textContent = sum ? sum + " · cambiar" : "Volver al paso 1";
+      var sub = $(".form-head__sub", form); if (sub && /^Paso 1/.test(sub.textContent)) { sub.dataset.p1 = sub.textContent; sub.textContent = "Paso 2: tus datos de contacto"; }
       go(2); form.nombre.focus({ preventScroll: true });
     });
-    var back = $("[data-back]", form); if (back) back.addEventListener("click", function () { go(1); });
+    var back = $("[data-back]", form); if (back) back.addEventListener("click", function () { var sub = $(".form-head__sub", form); if (sub && sub.dataset.p1) sub.textContent = sub.dataset.p1; go(1); });
 
     form.addEventListener("submit", function (e) {
       e.preventDefault();
