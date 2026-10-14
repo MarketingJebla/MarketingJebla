@@ -1,0 +1,19 @@
+# Netlify publica la carpeta generada /public (no hay paso de compilación en Netlify).
+[build]
+  publish = "public"
+
+# Vista previa: no indexar en buscadores (quitar al lanzar en dominio final)
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Robots-Tag = "noindex, nofollow"
+
+# Enlaces de la primera vista previa
+[[redirects]]
+  from = "/landing-principal/*"
+  to = "/"
+  status = 301
+[[redirects]]
+  from = "/landing-aveo-sedan/*"
+  to = "/modelos/aveo-sedan/"
+  status = 301
