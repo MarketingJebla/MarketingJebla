@@ -1,11 +1,10 @@
 // Secciones secundarias del sitio. Las llama build.mjs con sus utilidades.
-import { DEALER, INTERESES, MODELOS, PORTAFOLIO, MUNICIPIOS } from "./data.mjs";
+import { DEALER, MODELOS, PORTAFOLIO } from "./data.mjs";
 
 export function buildSecciones(h) {
   const { page, leadForm, leadSection, field, chips, checks, trust, crumbs, crumbsLD, faqLD, faqSec, visit, waBand, modelOpts, ic, img, money, wa, telFmt, esc, dir } = h;
   const head = (t, p) => `<section class="phead"><div class="wrap"><h1 class="h1">${t}</h1><p>${p}</p></div></section>`;
   const steps = list => `<ol class="steps">${list.map(([t, d]) => `<li><strong>${t}</strong><span>${d}</span></li>`).join("")}</ol>`;
-  const general = (sel = "cotizacion", modelo = "") => `<p class="lbl">¿Qué necesitas?</p>${chips("interes", INTERESES, sel)}${field("Modelo de interés", `<select name="modelo" data-req="select">${modelOpts(modelo)}</select>`, "modelo", "Elige un modelo para continuar")}`;
   const years = `<option value="">Año</option>${Array.from({ length: 18 }, (_, i) => 2026 - i).map(y => `<option>${y}</option>`).join("")}<option>Anterior a 2009</option>`;
   const LD = (name, path, faq) => [crumbsLD([["Inicio", "/"], [name, path]]), ...(faq ? [faqLD(faq)] : [])];
 
@@ -25,7 +24,7 @@ ${head("Promociones Chevrolet en Ciudad Victoria", "Ofertas vigentes de la marca
       return `<article class="pcard"><a href="/modelos/${m.slug}/"><img src="${img(p.img, 600)}" alt="Chevrolet ${esc(m.nombre)}" loading="lazy" width="320" height="160"></a><div><h3>${esc(m.nombre)}</h3><p class="mcard__price">Desde <strong>${money(m.precio)}*</strong></p><ul>${m.promo.map(x => `<li>${esc(x)}</li>`).join("")}</ul><a class="btn btn--primary" href="/modelos/${m.slug}/#cotizar" data-cta="promo_${m.slug}">Quiero esta promoción</a></div></article>`;
     }).join("")}</div>
 <p class="legal">*Promociones publicadas por la marca para octubre de 2026, sujetas a términos, condiciones, vigencia y aprobación de crédito. Consulta en chevrolet.com.mx o con tu asesor.</p></div></section>
-${leadSection(`<h2 class="h1">¿Buscas promoción para otro modelo?</h2>${checks(["Te decimos qué promociones aplican hoy", "Comparamos contado vs. financiamiento", "Sumamos el valor de tu auto a cuenta"])}`, leadForm({ title: "Pide tu promoción", origen: "promociones", step1: general() }))}
+${leadSection(`<h2 class="h1">¿Buscas promoción para otro modelo?</h2>${checks(["Te decimos qué promociones aplican hoy", "Comparamos contado vs. financiamiento", "Sumamos el valor de tu auto a cuenta"])}`, leadForm({ title: "Pide tu promoción", origen: "promociones", pickModel: true }))}
 ${faqSec(faqP)}`,
   });
 
@@ -46,7 +45,7 @@ ${head("Financiamiento para tu Chevrolet", "Calcula tu enganche en segundos y te
 <a class="btn btn--primary btn--block btn--lg" href="#cotizar" data-calc-cta data-cta="calc_cotizar">Recibir mi plan de mensualidades</a><p class="fine">Cálculo ilustrativo sobre el precio desde. La mensualidad depende de la versión, la institución financiera y la aprobación de crédito.</p></div></div></section>
 <section class="sec sec--alt"><div class="wrap grid2"><div><h2 class="h2">Documentos que normalmente se piden</h2><ul class="doclist"><li>Identificación oficial vigente</li><li>Comprobante de domicilio reciente</li><li>Comprobantes de ingresos</li></ul><p class="fine">Los requisitos exactos dependen de la institución financiera y del plan. Tu asesor te confirma la lista.</p></div>
 <div><h2 class="h2">¿Tienes auto?</h2><p>Puedes usarlo como parte de tu enganche. <a href="/seminuevos/">Valúalo aquí</a>.</p></div></div></section>
-${leadSection(`<h2 class="h1">Recibe tu plan de mensualidades</h2>${checks(["Opciones de plazo y enganche para tu caso", "Te ayudamos a integrar tu solicitud", "Sin compromiso"])}`, leadForm({ title: "Recibe tu plan", origen: "financiamiento", interes: "financiamiento", submit: "Recibir mi plan", step1: general("financiamiento") }))}
+${leadSection(`<h2 class="h1">Recibe tu plan de mensualidades</h2>${checks(["Opciones de plazo y enganche para tu caso", "Te ayudamos a integrar tu solicitud", "Sin compromiso"])}`, leadForm({ title: "Recibe tu plan", origen: "financiamiento", interes: "financiamiento", submit: "Recibir mi plan", pickModel: true }))}
 ${faqSec(faqF)}`,
   });
 
@@ -54,16 +53,14 @@ ${faqSec(faqF)}`,
   const faqS = [["¿Qué autos reciben a cuenta?", "Recibimos autos de cualquier marca. El valor depende del año, kilometraje y estado del vehículo."],
     ["¿La valuación tiene costo?", "No. La valuación es gratuita y sin compromiso."],
     ["¿Qué necesito llevar?", "Tu auto, la factura o documento de propiedad y una identificación oficial. Tu asesor te confirma los detalles."]];
-  const step1S = `${field("Marca y modelo de tu auto", `<input name="auto_actual" type="text" placeholder="Ej. Nissan Versa" data-req="text">`, "auto_actual", "Escribe la marca y el modelo")}
-<div class="row2">${field("Año", `<select name="anio" data-req="select">${years}</select>`, "anio", "Elige el año")}${field("Kilometraje", `<select name="km" data-req="select"><option value="">Km</option><option>Menos de 30,000</option><option>30,000 a 60,000</option><option>60,000 a 100,000</option><option>Más de 100,000</option></select>`, "km", "Elige el kilometraje")}</div>
-${field("¿Qué Chevrolet te interesa?", `<select name="modelo">${modelOpts()}</select>`)}`;
+  const preS = field("Tu auto actual", `<input name="auto_actual" type="text" placeholder="Marca, modelo y año (ej. Versa 2018)" data-req="text">`, "auto_actual", "Escribe la marca, modelo y año");
   page({
     path: "/seminuevos/", title: "Deja tu auto a cuenta en Ciudad Victoria | Valuación gratis · Chevrolet Jebla",
     desc: "Valuamos tu auto gratis y lo tomamos a cuenta de tu nuevo Chevrolet en Ciudad Victoria. Cualquier marca. Chevrolet Jebla, distribuidor autorizado.",
     ld: LD("Auto a cuenta", "/seminuevos/", faqS),
     body: `${crumbs([["Auto a cuenta", "/seminuevos/"]])}
-${leadSection(`<p class="eyebrow">Valuación gratis</p><h1 class="h1">Deja tu auto a cuenta de tu nuevo Chevrolet</h1>${checks(["Recibimos autos de cualquier marca", "Valuación gratuita y sin compromiso", "Su valor puede contar como parte de tu enganche"])}${steps([["Cuéntanos de tu auto", "Marca, modelo, año y kilometraje."], ["Recibe una valuación", "Te contactamos para revisarlo."], ["Estrena", "Aplicamos su valor a tu nuevo Chevrolet."]])}`,
-      leadForm({ title: "Valúa tu auto", sub: "Paso 1: datos de tu auto", origen: "seminuevos", interes: "seminuevos", submit: "Recibir mi valuación", step1: step1S }))}
+${leadSection(`<p class="eyebrow">Valuación gratis</p><h1 class="h1">Deja tu auto a cuenta de tu nuevo Chevrolet</h1>${checks(["Recibimos autos de cualquier marca", "Valuación gratuita y sin compromiso", "Su valor puede contar como parte de tu enganche"])}${steps([["Cuéntanos de tu auto", "Marca, modelo y año."], ["Recibe una valuación", "Te contactamos para revisarlo."], ["Estrena", "Aplicamos su valor a tu nuevo Chevrolet."]])}`,
+      leadForm({ title: "Valúa tu auto", origen: "seminuevos", interes: "seminuevos", submit: "Recibir mi valuación", pickModel: true, pre: preS }))}
 ${waBand("¿Prefieres mandar fotos de tu auto?", "Escríbenos por WhatsApp y envía fotos para darte una idea de su valor.", "Hola, quiero dejar mi auto a cuenta de un Chevrolet nuevo. Les comparto fotos.")}
 ${faqSec(faqS)}`,
   });
@@ -81,23 +78,19 @@ ${field("Fecha preferida", `<input name="fecha_pref" type="date" data-req="text"
     ld: LD("Servicio", "/servicio/", faqV),
     body: `${crumbs([["Servicio", "/servicio/"]])}
 ${leadSection(`<p class="eyebrow">Servicio certificado Chevrolet</p><h1 class="h1">Agenda tu cita de servicio</h1>${checks(["Técnicos certificados por Chevrolet", "Refacciones originales", "Te confirmamos la cita por WhatsApp"])}<p>¿Prefieres llamar? Servicio: <a href="tel:+52${DEALER.telServicio}" data-cta="servicio_call"><strong>${telFmt(DEALER.telServicio)}</strong></a></p>`,
-      leadForm({ title: "Agenda tu cita", sub: "Paso 1: tu auto y el servicio", origen: "servicio", interes: "servicio", submit: "Solicitar mi cita", step1: step1V }))}
+      leadForm({ title: "Agenda tu cita", origen: "servicio", interes: "servicio", submit: "Solicitar mi cita", pre: step1V, qualify: false }))}
 ${faqSec(faqV)}
 ${visit("Te esperamos en el taller")}`,
   });
 
   // ---------- PRUEBA DE MANEJO ----------
-  const horarios = ["Mañana", "Tarde", "Sábado"].map(s => ({ id: s, label: s }));
-  const step1T = `${field("¿Qué modelo quieres manejar?", `<select name="modelo" data-req="select"><option value="">Selecciona un modelo</option>${MODELOS.map(m => `<option>${esc(m.nombre)}</option>`).join("")}<optgroup label="Otros">${PORTAFOLIO.filter(p => !p.slug).map(p => `<option>${esc(p.nombre)}</option>`).join("")}</optgroup></select>`, "modelo", "Elige un modelo")}
-${field("Fecha preferida", `<input name="fecha_pref" type="date" data-req="text">`, "fecha_pref", "Elige una fecha")}
-<p class="lbl">Horario</p>${chips("horario", horarios, "Mañana")}`;
   page({
     path: "/prueba-de-manejo/", title: "Prueba de manejo Chevrolet en Ciudad Victoria | Agenda hoy · Chevrolet Jebla",
     desc: "Agenda tu prueba de manejo Chevrolet en Ciudad Victoria: Aveo, Onix, Groove, Captiva, Tracker, Trax y más. Elige día y horario.",
     ld: LD("Prueba de manejo", "/prueba-de-manejo/"),
     body: `${crumbs([["Prueba de manejo", "/prueba-de-manejo/"]])}
-${leadSection(`<p class="eyebrow">Sin compromiso</p><h1 class="h1">Maneja hoy el Chevrolet que quieres</h1>${checks(["Elige modelo, día y horario", "Te confirmamos por WhatsApp", "Resolvemos tus dudas de versiones y precio en la agencia"])}${trust}`,
-      leadForm({ title: "Agenda tu prueba de manejo", sub: "Paso 1: modelo y horario", origen: "prueba-de-manejo", interes: "prueba", submit: "Agendar mi prueba", step1: step1T }))}
+${leadSection(`<p class="eyebrow">Sin compromiso</p><h1 class="h1">Maneja hoy el Chevrolet que quieres</h1>${checks(["Elige el modelo que quieres manejar", "Acordamos día y hora por WhatsApp", "Resolvemos tus dudas de versiones y precio en la agencia"])}${trust}`,
+      leadForm({ title: "Agenda tu prueba de manejo", origen: "prueba-de-manejo", interes: "prueba", submit: "Agendar mi prueba", pickModel: true }))}
 ${visit("Te esperamos en Ciudad Victoria")}`,
   });
 
@@ -114,7 +107,7 @@ ${head("Contacto y ubicación", "Escríbenos, llámanos o visítanos. Atendemos 
 <a class="tile" href="${wa("Hola, quiero información.")}" target="_blank" rel="noopener" data-cta="contacto_whatsapp">${ic("wa", "ic ic--lg")}<strong>WhatsApp</strong><span>${telFmt(DEALER.whatsapp.slice(3))}</span></a>
 <a class="tile" href="${DEALER.maps}" target="_blank" rel="noopener" data-cta="contacto_maps">${ic("pin", "ic ic--lg")}<strong>Cómo llegar</strong><span>Abrir en Google Maps</span></a></div></div></section>
 ${visit()}
-${leadSection(`<h2 class="h1">¿Te llamamos?</h2>${checks(["Déjanos tus datos y un asesor te contacta", "Ventas, financiamiento, auto a cuenta o servicio"])}`, leadForm({ title: "Déjanos tus datos", origen: "contacto", step1: general() }))}`,
+${leadSection(`<h2 class="h1">¿Te llamamos?</h2>${checks(["Déjanos tus datos y un asesor te contacta", "Ventas, financiamiento, auto a cuenta o servicio"])}`, leadForm({ title: "Déjanos tus datos", origen: "contacto", pickModel: true }))}`,
   });
 
   // ---------- AVISO DE PRIVACIDAD (plantilla) ----------

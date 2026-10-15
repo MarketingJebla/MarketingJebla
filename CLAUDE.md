@@ -19,5 +19,6 @@ Sitio estático de captación de leads para Chevrolet Jebla (Ciudad Victoria, Ta
 - Mobile-first y enfocado en conversión: pocos campos, CTAs claros, WhatsApp y llamada siempre a la mano.
 - Respetar la marca: colores y estilo del sitio oficial; no inventar precios, versiones ni promociones (usar "Pide tu precio" o marcar PENDIENTE).
 - Formularios en modo dummy: los leads se guardan en localStorage (`#leads` para verlos). CRM futuro vía `window.JEBLA_CRM_ENDPOINT`.
-- Mantener el aviso de privacidad en todo formulario.
+- Formularios de ventas (función `leadForm`): paso 1 = tiempo para estrenar + enganche estimado (y selector de modelo donde no se conoce); paso 2 = nombre completo, WhatsApp y correo. Opciones y puntos en `TIEMPOS`/`ENGANCHES` de `src/data.mjs`; cada lead lleva `calidad` caliente/tibio/frío. El formulario de servicio no lleva calificación.
+- Mantener el aviso de privacidad en todo formulario (línea de texto con enlace bajo el botón).
 - Mientras `SITE.preview` sea `true`, el sitio no se indexa (franja "Versión de prueba" + noindex).

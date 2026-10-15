@@ -1,6 +1,6 @@
 // Generador estático del sitio. Uso: node build.mjs  →  escribe /public
 import { mkdirSync, writeFileSync, rmSync, cpSync, existsSync } from "node:fs";
-import { SITE, DEALER, MUNICIPIOS, INTERESES, MODELOS, PORTAFOLIO, CATEGORIAS, HERO_HOME } from "./src/data.mjs";
+import { SITE, DEALER, MUNICIPIOS, INTERESES, MODELOS, PORTAFOLIO, CATEGORIAS, HERO_HOME, TIEMPOS, ENGANCHES } from "./src/data.mjs";
 
 const OUT = "public";
 rmSync(OUT, { recursive: true, force: true });
@@ -92,36 +92,31 @@ ${footer()}
 }
 
 // ---------- formulario de leads ----------
-const muniOpts = `<option value="">Selecciona tu municipio</option>${MUNICIPIOS.map(m => `<option>${m}</option>`).join("")}<option>Otro municipio</option>`;
 const modelOpts = (sel = "") => `<option value="">Selecciona un modelo</option>${Object.entries(CATEGORIAS).map(([c, n]) => `<optgroup label="${n}">${PORTAFOLIO.filter(p => p.cat === c).map(p => `<option${p.nombre === sel ? " selected" : ""}>${esc(p.nombre)}</option>`).join("")}</optgroup>`).join("")}<option>Aún no lo decido</option>`;
 const field = (lbl, inner, name, err) => `<label class="field"><span class="lbl">${lbl}</span>${inner}${err ? `<span class="err" data-for="${name}">${err}</span>` : ""}</label>`;
 const chips = (name, items, sel) => `<div class="chips" role="radiogroup">${items.map(it => `<label class="chip"><input type="radio" name="${name}" value="${it.id}"${it.id === sel ? " checked" : ""}><span>${esc(it.label)}</span></label>`).join("")}</div>`;
+// Opción única obligatoria (calificación del lead)
+const choice = (name, lbl, items, err, stack) => `<p class="lbl" id="l-${name}">${lbl}</p><div class="chips${stack ? " chips--stack" : ""}" role="radiogroup" aria-labelledby="l-${name}">${items.map(it => `<label class="chip"><input type="radio" name="${name}" value="${esc(it.id)}" data-pts="${it.pts}" data-req="radio"><span>${esc(it.label)}</span></label>`).join("")}</div><span class="err" data-for="${name}">${err}</span>`;
+const qualifyFields = choice("tiempo", "¿Cuándo piensas estrenar?", TIEMPOS, "Elige una opción") + choice("enganche", "Enganche estimado", ENGANCHES, "Elige una opción", true);
+const modelField = `${field("Modelo de interés", `<select name="modelo" data-req="select">${modelOpts()}</select>`, "modelo", "Elige un modelo")}`;
 
 const contactFields = `
-${field("Nombre", `<input name="nombre" type="text" autocomplete="name" placeholder="Tu nombre" data-req="nombre">`, "nombre", "Escribe tu nombre")}
-${field("WhatsApp o celular", `<div class="tel"><span class="tel__pre">+52</span><input name="telefono" type="tel" inputmode="numeric" autocomplete="tel-national" placeholder="834 123 4567" data-req="telefono"></div>`, "telefono", "Escribe 10 dígitos")}
-${field("¿Dónde vives?", `<select name="municipio" data-req="select">${muniOpts}</select>`, "municipio", "Selecciona tu municipio")}
-<p class="lbl">¿Cómo prefieres que te contactemos?</p>
-<div class="seg" role="radiogroup"><label><input type="radio" name="contacto" value="whatsapp" checked><span>${ic("wa")}WhatsApp</span></label><label><input type="radio" name="contacto" value="llamada"><span>${ic("phone")}Llamada</span></label></div>
-<label class="consent"><input type="checkbox" name="privacidad" data-req="check"><span>Acepto el <a href="/aviso-de-privacidad/" target="_blank">aviso de privacidad</a> y que ${esc(DEALER.corto)} me contacte.</span></label>
-<span class="err" data-for="privacidad">Necesitamos tu autorización para contactarte</span>`;
+${field("Nombre completo", `<input name="nombre" type="text" autocomplete="name" placeholder="Nombre y apellido" data-req="nombre">`, "nombre", "Escribe tu nombre completo")}
+${field("WhatsApp", `<div class="tel"><span class="tel__pre">+52</span><input name="telefono" type="tel" inputmode="numeric" autocomplete="tel-national" placeholder="834 123 4567" data-req="telefono"></div>`, "telefono", "Escribe 10 dígitos")}
+${field("Correo", `<input name="correo" type="email" autocomplete="email" inputmode="email" placeholder="tucorreo@ejemplo.com" data-req="email">`, "correo", "Revisa tu correo")}`;
 
-const moreFields = `<details class="more"><summary>Agregar más detalles (opcional)</summary>
-${field("Correo electrónico", `<input name="correo" type="email" autocomplete="email" placeholder="tucorreo@ejemplo.com" data-req="email-opt">`, "correo", "Revisa tu correo")}
-<label class="switch"><input type="checkbox" name="autoACuenta"><span>Quiero dejar mi auto a cuenta</span></label>
-<label class="switch"><input type="checkbox" name="financiamiento"><span>Me interesa financiamiento</span></label></details>`;
-
-/** opts: {title, sub, interes, origen, step1 (html, opcional), extra (html en paso de datos), submit, model} */
+/** opts: {title, sub, interes, origen, model, pickModel (selector de modelo), pre (campos extra al inicio del paso 1), qualify (default true), submit} */
 function leadForm(o) {
-  const two = !!o.step1;
+  const step1 = (o.pickModel ? modelField : "") + (o.pre || "") + (o.qualify === false ? "" : qualifyFields);
   return `<div class="card form-card" id="formCard"><form class="lead-form" novalidate data-origen="${o.origen}" data-interes="${o.interes || "cotizacion"}"${o.model ? ` data-modelo="${esc(o.model)}"` : ""}>
-<div class="form-head"><h2 class="h3" data-title>${esc(o.title)}</h2><p class="form-head__sub">${esc(o.sub || "Toma menos de 1 minuto")}</p>${two ? `<div class="progress" aria-hidden="true"><span></span></div>` : ""}</div>
-${two ? `<fieldset class="step is-active" data-step="1"><legend class="sr-only">Paso 1 de 2</legend>${o.step1}<button type="button" class="btn btn--primary btn--block btn--lg" data-next>Continuar ${ic("arrow")}</button></fieldset>` : ""}
-<fieldset class="step${two ? "" : " is-active"}" data-step="${two ? 2 : 1}"><legend class="sr-only">Tus datos</legend>
-${two ? `<button type="button" class="back" data-back>${ic("back")} <span data-summary>Cambiar</span></button>` : ""}
-${o.extra || ""}${contactFields.replace('<p class="lbl">¿Cómo', moreFields + '<p class="lbl">¿Cómo')}
+<input type="hidden" name="version"><input type="hidden" name="color">
+<div class="form-head"><h2 class="h3" data-title>${esc(o.title)}</h2><p class="form-head__sub">${esc(o.sub || "Paso 1 de 2 · Toma menos de 1 minuto")}</p><div class="progress" aria-hidden="true"><span></span></div></div>
+<fieldset class="step is-active" data-step="1"><legend class="sr-only">Paso 1 de 2</legend>${step1}<button type="button" class="btn btn--primary btn--block btn--lg" data-next>Continuar ${ic("arrow")}</button></fieldset>
+<fieldset class="step" data-step="2"><legend class="sr-only">Paso 2 de 2: tus datos</legend>
+<button type="button" class="back" data-back>${ic("back")} <span data-summary>Volver</span></button>
+${contactFields}
 <button type="submit" class="btn btn--primary btn--block btn--lg" data-submit>${esc(o.submit || "Recibir mi cotización")}</button>
-<p class="micro">${ic("lock")}Tus datos solo se usan para atender tu solicitud.</p></fieldset>
+<p class="consent-line">Al enviar aceptas el <a href="/aviso-de-privacidad/" target="_blank">aviso de privacidad</a> y que ${esc(DEALER.corto)} te contacte. ${ic("lock")}</p></fieldset>
 </form></div>`;
 }
 
@@ -152,8 +147,6 @@ ${Object.keys(CATEGORIAS).map(c => `<div class="rail" data-panel="${c}"${c === "
 // =========================================================
 // PÁGINAS
 // =========================================================
-const generalStep1 = (sel = "") => `<p class="lbl">¿Qué necesitas?</p>${chips("interes", INTERESES, "cotizacion")}
-${field("Modelo de interés", `<select name="modelo" data-req="select">${modelOpts(sel)}</select>`, "modelo", "Elige un modelo para continuar")}`;
 
 // ---------- INICIO ----------
 page({
@@ -162,7 +155,7 @@ page({
   ogImage: img(HERO_HOME[0].dsk, 1200),
   body: `<section class="hero" aria-label="Promociones del mes"><div class="hero__track" data-carousel tabindex="0">${HERO_HOME.map((h, i) => `<div class="slide" role="group" aria-label="${i + 1} de ${HERO_HOME.length}: ${h.modelo}"><a href="/modelos/${h.slug}/"><picture><source media="(min-width:600px)" srcset="${img(h.dsk, 1200)} 1280w, ${img(h.dsk, 1920)} 2048w" sizes="100vw" width="2048" height="819"><img src="${img(h.mob, 600)}" alt="Chevrolet ${h.modelo}, promoción de octubre" width="640" height="640"${i ? ' loading="lazy"' : ' fetchpriority="high"'}></picture></a><div class="slide__cta"><a class="btn btn--primary btn--lg" href="/modelos/${h.slug}/#cotizar" data-cta="hero_${i}">Cotizar ${h.modelo}</a></div></div>`).join("")}</div><div class="hero__dots" data-dots></div></section>
 ${leadSection(`<p class="eyebrow">Ciudad Victoria y municipios de la región</p><h1 class="h1">Estrena tu Chevrolet con el precio y el plan que te conviene</h1>${checks(["Cotización por WhatsApp en minutos, sin compromiso", "Prueba de manejo a tu horario", "Financiamiento y opción de dejar tu auto a cuenta"])}${trust}`,
-    leadForm({ title: "Cotiza tu Chevrolet", origen: "inicio", step1: generalStep1() }))}
+    leadForm({ title: "Cotiza tu Chevrolet", origen: "inicio", pickModel: true }))}
 <section class="models" id="modelos"><div class="wrap"><div class="sec-head"><h2 class="h2">Elige tu Chevrolet</h2><p>Precios desde, en Ciudad Victoria.</p></div>${catalog()}<p class="fine">*Precios sugeridos de venta al público de la versión de entrada.</p><p><a class="link-more" href="/modelos/">Ver catálogo completo →</a></p></div></section>
 <section class="shortcuts"><div class="wrap"><div class="sec-head"><h2 class="h2">¿Cómo te ayudamos hoy?</h2></div><div class="tiles">
 ${[["/financiamiento/", "card", "Financiamiento", "Calcula tu enganche y recibe tu plan"], ["/prueba-de-manejo/", "wheel", "Prueba de manejo", "Agenda el día y la hora que prefieras"], ["/seminuevos/", "swap", "Auto a cuenta", "Valuamos tu auto para tu siguiente Chevrolet"], ["/servicio/", "wrench", "Cita de servicio", "Servicio certificado Chevrolet"]].map(([h, i, t, d]) => `<a class="tile" href="${h}" data-cta="tile_${h.replace(/\//g, "")}">${ic(i, "ic ic--lg")}<strong>${t}</strong><span>${d}</span></a>`).join("")}
@@ -187,17 +180,12 @@ page({
   body: `${crumbs([["Modelos", "/modelos/"]])}
 <section class="phead"><div class="wrap"><h1 class="h1">Catálogo Chevrolet en Ciudad Victoria</h1><p>Compara precios desde y elige el que va contigo. Toca un modelo para ver colores, versiones y cotizar.</p></div></section>
 <section class="models models--page"><div class="wrap">${catalog()}<p class="fine">*Precios sugeridos de venta al público de la versión de entrada, publicados por la marca. Consulta precio por versión con tu asesor.</p></div></section>
-${leadSection(`<h2 class="h1">¿No sabes cuál elegir?</h2>${checks(["Cuéntanos qué buscas y te recomendamos", "Comparativa de versiones por WhatsApp", "Te decimos qué tenemos en inventario hoy"])}`, leadForm({ title: "Te ayudamos a elegir", origen: "catalogo", step1: generalStep1() }))}`,
+${leadSection(`<h2 class="h1">¿No sabes cuál elegir?</h2>${checks(["Cuéntanos qué buscas y te recomendamos", "Comparativa de versiones por WhatsApp", "Te decimos qué tenemos en inventario hoy"])}`, leadForm({ title: "Te ayudamos a elegir", origen: "catalogo", pickModel: true }))}`,
 });
 
 // ---------- PÁGINAS DE MODELO ----------
 for (const m of MODELOS) {
   const path = `/modelos/${m.slug}/`;
-  const opts = (m.versiones || m.prefs).concat([{ id: "nose", nombre: "Aún no lo sé", trans: "Te ayudamos a elegir" }]);
-  const vLabel = m.versiones ? "¿Qué versión te interesa?" : "¿Qué buscas en tu " + m.corto + "?";
-  const step1 = `<p class="lbl">${vLabel}</p><div class="vpick" role="radiogroup">${opts.map(v => `<label class="vopt"><input type="radio" name="version" value="${esc(v.id === "nose" ? "Por definir" : v.nombre + (m.versiones ? " " + v.trans : ""))}" data-req="radio"><span><strong>${esc(v.nombre)}</strong><small>${esc(v.trans)}</small></span>${m.versiones && v.id !== "nose" ? `<em>Pide tu precio</em>` : ""}</label>`).join("")}</div><span class="err" data-for="version">Elige una opción para continuar</span>
-<p class="lbl">¿Qué necesitas?</p>${chips("interes", INTERESES, "cotizacion")}
-<p class="lbl">Color <span class="opt">(opcional)</span></p><div class="swatches swatches--sm" role="radiogroup">${m.colores.map(c => `<label class="swatch" title="${esc(c[0])}" style="--c:${c[1]}"><input type="radio" name="color" value="${esc(c[0])}"><span class="sr-only">${esc(c[0])}</span></label>`).join("")}</div>`;
   const faq = [[`¿Cuánto cuesta el Chevrolet ${m.nombre} en Ciudad Victoria?`, `El precio sugerido desde es de ${money(m.precio)}* en su versión de entrada. Pide el precio de la versión que te interesa y las promociones vigentes por WhatsApp o en el formulario.`],
     [`¿Puedo hacer una prueba de manejo del ${m.corto}?`, "Sí. Agenda el día y la hora que prefieras y te esperamos en la agencia en Ciudad Victoria."],
     ["¿Puedo dejar mi auto actual a cuenta?", `Sí. Valuamos tu auto y aplicamos su valor a tu ${m.corto}.`],
@@ -214,7 +202,7 @@ ${m.promo.length ? `<ul class="promo" aria-label="Promoción vigente">${m.promo.
 <div class="mhero__btns"><a class="btn btn--primary btn--lg" href="#cotizar" data-cta="hero_cotizar">Cotizar mi ${esc(m.corto)}</a><a class="btn btn--wa btn--lg" href="${wa("Hola, me interesa el Chevrolet " + m.nombre + ". ¿Me dan precio, versiones y promoción del mes?")}" target="_blank" rel="noopener" data-cta="hero_whatsapp" data-wa>${ic("wa")}<span class="hide-xs">WhatsApp</span></a></div></div></section>
 ${crumbs([["Modelos", "/modelos/"], [m.corto, path]])}
 ${leadSection(`<h2 class="h1">${esc(m.lema)} Estrena tu ${esc(m.corto)} con un plan a tu medida</h2><p class="lead__intro">${esc(m.intro)}</p>${checks(["Precio de la versión que elijas, por WhatsApp", "Prueba de manejo a tu horario", "Financiamiento y opción de dejar tu auto a cuenta"])}${trust}`,
-      leadForm({ title: "Cotiza tu " + m.corto, origen: "modelo-" + m.slug, model: m.nombre, step1 }))}
+      leadForm({ title: "Cotiza tu " + m.corto, origen: "modelo-" + m.slug, model: m.nombre }))}
 <section class="feats"><div class="wrap"><h2 class="h2">Lo que más te va a gustar</h2><div class="feats__grid">${m.destacados.map(d => `<div class="feat">${ic(d[0])}<strong>${esc(d[1])}</strong><span>${esc(d[2])}</span></div>`).join("")}</div></div></section>
 <section class="colors" id="colores"><div class="wrap"><div class="sec-head"><h2 class="h2">Elige tu color</h2><p>Toca un color para verlo y cotizarlo así.</p></div>
 <div class="colors__stage"><img data-color-img src="${img(m.colores[0][2], 1200)}" alt="${esc(m.corto)} en ${esc(m.colores[0][0])}" width="1024" height="512" loading="lazy"></div><p class="colors__name" data-color-name>${esc(m.colores[0][0])}</p>
@@ -245,7 +233,7 @@ page({ path: "/gracias/", noindex: true, title: "¡Gracias! Recibimos tu solicit
 page({ path: "/404", noindex: true, title: "Página no encontrada | Chevrolet Jebla", desc: "La página que buscas no existe.",
   body: `<section class="phead phead--center"><div class="wrap"><h1 class="h1">No encontramos esta página</h1><p>Puede que el enlace haya cambiado. Te dejamos lo más buscado:</p><p class="btnrow"><a class="btn btn--primary" href="/modelos/">Ver modelos</a> <a class="btn btn--ghost" href="/">Ir al inicio</a></p></div></section>` });
 
-if (existsSync("src/secciones.mjs")) (await import("./src/secciones.mjs")).buildSecciones({ page, leadForm, leadSection, field, chips, checks, trust, crumbs, crumbsLD, faqLD, faqSec, visit, waBand, modelOpts, ic, img, money, wa, telFmt, esc, dir, muniOpts });
+if (existsSync("src/secciones.mjs")) (await import("./src/secciones.mjs")).buildSecciones({ page, leadForm, leadSection, field, chips, checks, trust, crumbs, crumbsLD, faqLD, faqSec, visit, waBand, modelOpts, ic, img, money, wa, telFmt, esc, dir });
 
 // ---------- sitemap y robots ----------
 writeFileSync(OUT + "/robots.txt", SITE.preview ? "User-agent: *\nDisallow: /\n" : `User-agent: *\nAllow: /\n${SITE.url ? "Sitemap: " + abs("/sitemap.xml") + "\n" : ""}`);

@@ -81,8 +81,6 @@
       if (r) r.checked = true;
       form.dataset.interes = id;
       var s = $("[data-submit]", form); if (s && TITLES[id]) s.textContent = TITLES[id];
-      if (id === "financiamiento" && form.financiamiento) form.financiamiento.checked = true;
-      if (id === "seminuevos" && form.autoACuenta) form.autoACuenta.checked = true;
     }
     form.addEventListener("change", function (e) { if (e.target.name === "interes") setInteres(e.target.value); });
 
@@ -98,9 +96,9 @@
       else if (t === "telefono") ok = digits(v).length === 10;
       else if (t === "select" || t === "text") ok = !!v;
       else if (t === "check") ok = el.checked;
-      else if (t === "email-opt") ok = !v || /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v);
+      else if (t === "email") ok = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v);
       else if (t === "radio") ok = !!form.querySelector('input[name="' + el.name + '"]:checked');
-      var wrap = el.closest(".field") || el.closest(".vpick");
+      var wrap = el.closest(".field") || el.closest(".chips");
       if (wrap) wrap.classList.toggle("is-invalid", !ok);
       var err = form.querySelector('.err[data-for="' + el.name + '"]'); if (err) err.classList.toggle("show", !ok);
       return ok;
@@ -123,10 +121,10 @@
     var next = $("[data-next]", form);
     if (next) next.addEventListener("click", function () {
       if (!validStep(1)) return;
-      var v = form.querySelector('input[name="version"]:checked'), c = form.querySelector('input[name="color"]:checked');
-      var sum = [form.auto_actual && form.auto_actual.value, form.dataset.modelo || (form.modelo && form.modelo.value), v && v.value, c && c.value].filter(Boolean).join(" · ");
+      var t = form.querySelector('input[name="tiempo"]:checked');
+      var sum = [form.dataset.modelo || (form.modelo && form.modelo.value), form.version && form.version.value, form.color && form.color.value, t && t.value].filter(Boolean).join(" · ");
       $("[data-summary]", form).textContent = sum ? sum + " · cambiar" : "Volver al paso 1";
-      var sub = $(".form-head__sub", form); if (sub && /^Paso 1/.test(sub.textContent)) { sub.dataset.p1 = sub.textContent; sub.textContent = "Paso 2: tus datos de contacto"; }
+      var sub = $(".form-head__sub", form); if (sub) { sub.dataset.p1 = sub.dataset.p1 || sub.textContent; sub.textContent = "Paso 2 de 2 · Solo faltan tus datos"; }
       go(2); form.nombre.focus({ preventScroll: true });
     });
     var back = $("[data-back]", form); if (back) back.addEventListener("click", function () { var sub = $(".form-head__sub", form); if (sub && sub.dataset.p1) sub.textContent = sub.dataset.p1; go(1); });
@@ -142,13 +140,15 @@
       lead.interes = lead.interes || form.dataset.interes;
       lead.modelo = form.dataset.modelo || lead.modelo || "";
       lead.telefono = digits(lead.telefono);
-      lead.autoACuenta = !!lead.autoACuenta; lead.financiamiento = !!lead.financiamiento || !!plan;
+      lead.financiamiento = lead.interes === "financiamiento" || !!plan;
+      // Calidad del lead según tiempo y enganche (ver TIEMPOS / ENGANCHES en src/data.mjs)
+      var pts = $$('input[data-pts]:checked', form).reduce(function (a, i) { return a + (+i.getAttribute("data-pts")); }, 0);
+      if (form.querySelector('input[name="tiempo"]')) { lead.puntos = pts; lead.calidad = pts >= 4 ? "caliente" : pts >= 2 ? "tibio" : "frío"; }
       if (plan) lead.plan = "Enganche " + plan.pct + "% (" + money(plan.eng) + "), " + plan.plazo + " meses";
       lead.origen = form.dataset.origen; lead.pagina = location.pathname; lead.utm = utm;
-      delete lead.privacidad;
       save(lead).then(function () {
-        track("lead_submit", { interes: lead.interes, modelo: lead.modelo, version: lead.version || "", municipio: lead.municipio, origen: lead.origen });
-        try { sessionStorage.setItem("jebla_last", JSON.stringify({ nombre: lead.nombre, modelo: lead.modelo, version: lead.version, color: lead.color, folio: lead.folio, interes: lead.interes, municipio: lead.municipio, plan: lead.plan })); } catch (e) {}
+        track("lead_submit", { interes: lead.interes, modelo: lead.modelo, version: lead.version || "", tiempo: lead.tiempo || "", enganche: lead.enganche || "", calidad: lead.calidad || "", origen: lead.origen });
+        try { sessionStorage.setItem("jebla_last", JSON.stringify({ nombre: lead.nombre, modelo: lead.modelo, version: lead.version, color: lead.color, folio: lead.folio, interes: lead.interes, plan: lead.plan })); } catch (e) {}
         location.href = "/gracias/?i=" + encodeURIComponent(lead.interes || "cotizacion");
       }).catch(function () {
         btn.disabled = false; btn.textContent = TITLES[form.dataset.interes] || "Enviar";
@@ -166,8 +166,8 @@
     // Botones que llevan al formulario con datos precargados
     window.jeblaGoForm = function (o) {
       if (o.modelo && form.modelo) form.modelo.value = o.modelo;
-      if (o.version) { var r = form.querySelector('input[name="version"][value="' + o.version + '"]'); if (r) r.checked = true; }
-      if (o.color) { var c = form.querySelector('input[name="color"][value="' + o.color + '"]'); if (c) c.checked = true; }
+      if (o.version && form.version) form.version.value = o.version;
+      if (o.color && form.color) form.color.value = o.color;
       if (o.interes) setInteres(o.interes);
       if (o.plan) plan = o.plan;
       go(1);
@@ -234,7 +234,7 @@
   // ---------- Visor de leads de prueba (#leads) ----------
   function showLeads() {
     var leads = []; try { leads = JSON.parse(localStorage.getItem("jebla_leads") || "[]"); } catch (e) {}
-    var cols = ["folio", "fecha", "origen", "interes", "modelo", "version", "color", "plan", "nombre", "telefono", "municipio", "correo", "contacto", "autoACuenta", "financiamiento", "auto_actual", "anio", "km", "servicio", "fecha_pref", "horario"];
+    var cols = ["folio", "fecha", "calidad", "tiempo", "enganche", "origen", "interes", "modelo", "version", "color", "plan", "nombre", "telefono", "correo", "auto_actual", "anio", "servicio", "fecha_pref"];
     var esc = function (s) { return String(s == null ? "" : s).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); };
     var box = document.createElement("div");
     box.setAttribute("style", "position:fixed;inset:0;z-index:999;background:#fff;overflow:auto;padding:16px;font-size:13px");

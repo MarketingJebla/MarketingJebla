@@ -209,3 +209,17 @@ export const HERO_HOME = [
   { slug: "captiva", modelo: "Captiva 2026", mob: R + "mob-captiva.jpg", dsk: R + "dsk-captiva.jpg" },
   { slug: "groove", modelo: "Groove 2027", mob: R + "mob-groove.jpg", dsk: R + "dsk-groove.jpg" },
 ];
+
+// ---------- Preguntas de calificación del lead (formularios de ventas) ----------
+// "pts" alimenta la calidad del lead: caliente (≥4), tibio (2–3), frío (≤1).
+export const TIEMPOS = [
+  { id: "Este mes", label: "Este mes", pts: 2 },
+  { id: "De 2 a 3 meses", label: "De 2 a 3 meses", pts: 1 },
+  { id: "Solo estoy cotizando", label: "Solo estoy cotizando", pts: 0 },
+];
+export const ENGANCHES = [
+  { id: "Más de $100,000 o de contado", label: "Más de $100,000 o de contado", pts: 3 },
+  { id: "De $50,000 a $100,000", label: "De $50,000 a $100,000", pts: 2 },
+  { id: "Menos de $50,000", label: "Menos de $50,000", pts: 1 },
+  { id: "Busco el enganche mínimo", label: "Busco el enganche mínimo", pts: 0 },
+];
