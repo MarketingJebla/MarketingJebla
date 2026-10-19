@@ -521,3 +521,33 @@ a.mcard__img{display:grid}
 .lead-form .lbl:first-of-type{margin-top:4px}
 .consent-line{font-size:12px;color:var(--mute);text-align:center;margin:10px 0 0;line-height:1.4}
 .consent-line .ic{width:12px;height:12px;vertical-align:-1px}
+
+/* =========================================================
+   Portada de modelo v2: el texto nunca tapa el vehículo
+   Móvil: texto → foto (recortada al auto) → botones. Escritorio: texto | foto.
+   ========================================================= */
+.mhero{display:block;min-height:0;max-height:none;height:auto;background:var(--dark);color:#fff;overflow:visible}
+.mhero__shade{display:none}
+.mhero__grid{display:grid;grid-template-areas:"text" "media" "btns";padding-top:20px;padding-bottom:20px;gap:14px}
+.mhero__text{grid-area:text}
+.mhero__title{font-size:26px;line-height:1.1;text-shadow:none;margin:0 0 6px}
+.mhero__city{display:block;font-size:.62em;font-weight:700;color:#cfcfcf;margin-top:2px}
+.mhero__price{margin:0 0 10px}
+.mhero .promo{margin:0}
+.mhero__media{grid-area:media;display:block;margin:0 -16px;position:static}
+.mhero__media img{position:static;display:block;width:100%;height:auto;aspect-ratio:4/3;object-fit:cover;object-position:50% var(--pos,75%);background:#2a2a2a}
+.mhero__btns{grid-area:btns}
+@media (min-width:600px){
+  .mhero__title{font-size:34px}
+  .mhero__media{margin:0;border-radius:6px;overflow:hidden}
+  .mhero__media img{aspect-ratio:auto;object-position:50% 50%}
+}
+@media (min-width:960px){
+  .mhero{height:auto}
+  .mhero__grid{grid-template-columns:minmax(320px,0.8fr) 1.2fr;grid-template-areas:"text media" "btns media";align-items:center;column-gap:40px;row-gap:20px;padding-top:40px;padding-bottom:40px}
+  .mhero__text,.mhero__btns{max-width:none}
+  .mhero__btns{align-self:start;display:flex}
+  .mhero__text{align-self:end}
+  .mhero__title{font-size:44px}
+  .mhero__in>*{max-width:none}
+}

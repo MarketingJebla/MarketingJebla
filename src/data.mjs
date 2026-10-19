@@ -55,7 +55,7 @@ const GENERAL_PROMO_LEGAL = "*Consulta términos, condiciones y vigencia en chev
 export const MODELOS = [
   {
     slug: "aveo-sedan", nombre: "Aveo Sedán 2026", corto: "Aveo Sedán", cat: "autos", precio: 234800,
-    hero: { mob: P + "cars/2026-aveo-sedan/mov/01-images/mh/2026-aveo-mh-xs.jpg", dsk: P + "cars/2026-aveo-sedan/mov/01-images/mh/2026-aveo-mh.jpg", mw: 1000, mh: 1500 },
+    hero: { mob: P + "cars/2026-aveo-sedan/mov/01-images/mh/2026-aveo-mh-xs.jpg", dsk: P + "cars/2026-aveo-sedan/mov/01-images/mh/2026-aveo-mh.jpg", mw: 1000, mh: 1500 , pos: "80%" },
     lema: "Totalmente renovado.",
     intro: "Líneas estilizadas, mayor seguridad, mejor tecnología y conectividad, con el excelente rendimiento de combustible de siempre.",
     seo: "Chevrolet Aveo Sedán 2026 en Ciudad Victoria desde $234,800. Pantalla de 8\", Apple CarPlay, cámara de reversa y 6 bolsas de aire. Cotiza con Chevrolet Jebla.",
@@ -74,7 +74,7 @@ export const MODELOS = [
   },
   {
     slug: "aveo-hb", nombre: "Aveo Hatchback 2026", corto: "Aveo HB", cat: "autos", precio: 228100,
-    hero: { mob: P + "cars/2026-aveo-hb/mov/01-images/mh/MOB.jpg", dsk: P + "cars/2026-aveo-hb/mov/01-images/mh/DESK.jpg", mw: 1000, mh: 1000 },
+    hero: { mob: P + "cars/2026-aveo-hb/mov/01-images/mh/MOB.jpg", dsk: P + "cars/2026-aveo-hb/mov/01-images/mh/DESK.jpg", mw: 1000, mh: 1000 , pos: "85%" },
     lema: "Renovación en movimiento.",
     intro: "Para que disfrutes más tus trayectos: versatilidad en diseño y tecnología en un hatchback ágil para la ciudad.",
     seo: "Chevrolet Aveo Hatchback 2026 en Ciudad Victoria desde $228,100. Pantalla de 8\", Apple CarPlay, cámara de reversa y 6 bolsas de aire. Cotiza con Chevrolet Jebla.",
@@ -89,7 +89,7 @@ export const MODELOS = [
   },
   {
     slug: "onix", nombre: "Onix 2026", corto: "Onix", cat: "autos", precio: 257100,
-    hero: { mob: P + "cars/2026-onix/mov/01-images/mh/mh-2026-onix-1000x1000.png", dsk: P + "cars/2026-onix/mov/01-images/mh/mh-2026-onix-2250x1000.png", mw: 1000, mh: 1500 },
+    hero: { mob: P + "cars/2026-onix/mov/01-images/mh/mh-2026-onix-1000x1000.png", dsk: P + "cars/2026-onix/mov/01-images/mh/mh-2026-onix-2250x1000.png", mw: 1000, mh: 1500 , pos: "75%" },
     lema: "Diseño que habla de ti.",
     intro: "Sedán deportivo con motor turbo eficiente: potencia para disfrutar cada kilómetro y tecnología para estar siempre conectado.",
     seo: "Chevrolet Onix 2026 en Ciudad Victoria desde $257,100. Motor 1.0L Turbo de 116 HP, pantalla de 10.25\" y asistente en tráfico. Cotiza con Chevrolet Jebla.",
@@ -110,7 +110,7 @@ export const MODELOS = [
   },
   {
     slug: "groove", nombre: "Groove 2027", corto: "Groove", cat: "suvs", precio: 353500,
-    hero: { mob: P + "crossovers-suvs/2027-groove/mov/01-images/00-2027-groove-mh-mobile.jpg", dsk: P + "crossovers-suvs/2027-groove/mov/01-images/00-2027-groove-mh-desktop.jpg", mw: 1000, mh: 1500 },
+    hero: { mob: P + "crossovers-suvs/2027-groove/mov/01-images/00-2027-groove-mh-mobile.jpg", dsk: P + "crossovers-suvs/2027-groove/mov/01-images/00-2027-groove-mh-desktop.jpg", mw: 1000, mh: 1500 , pos: "65%" },
     lema: "Resalta con tu propio estilo.",
     intro: "SUV compacta con motor 1.5L Turbo de 149 HP, pantalla de 10.25\" y asistencias de seguridad ADAS según versión.",
     seo: "Chevrolet Groove 2027 en Ciudad Victoria desde $353,500. SUV con motor 1.5L Turbo de 149 HP, pantalla de 10.25\" y seguridad ADAS. Cotiza con Chevrolet Jebla.",
@@ -129,7 +129,7 @@ export const MODELOS = [
   },
   {
     slug: "captiva", nombre: "Captiva 2026", corto: "Captiva", cat: "suvs", precio: 358800,
-    hero: { mob: P + "crossovers-suvs/2026-captiva/mastheads/v2/2026-captiva-mh-xs.jpg", dsk: P + "crossovers-suvs/2026-captiva/mastheads/v2/2026-captiva-mh.jpg", mw: 1000, mh: 1500 },
+    hero: { mob: P + "crossovers-suvs/2026-captiva/mastheads/v2/2026-captiva-mh-xs.jpg", dsk: P + "crossovers-suvs/2026-captiva/mastheads/v2/2026-captiva-mh.jpg", mw: 1000, mh: 1500 , pos: "60%" },
     lema: "Espacio para toda la familia.",
     intro: "La SUV familiar con capacidad para hasta 7 pasajeros, pantalla de 10.4\" y 6 bolsas de aire.",
     seo: "Chevrolet Captiva 2026 en Ciudad Victoria desde $358,800. SUV familiar hasta 7 pasajeros, pantalla de 10.4\" y 6 bolsas de aire. Cotiza con Chevrolet Jebla.",
@@ -144,7 +144,7 @@ export const MODELOS = [
   },
   {
     slug: "tracker", nombre: "Tracker 2026", corto: "Tracker", cat: "suvs", precio: 425000,
-    hero: { mob: P + "crossovers-suvs/2026-tracker/mov/01-images/mh/2026-tracker-mh-xs.jpg", dsk: P + "crossovers-suvs/2026-tracker/mov/01-images/mh/2026-tracker-mh.jpg", mw: 1000, mh: 1500 },
+    hero: { mob: P + "crossovers-suvs/2026-tracker/mov/01-images/mh/2026-tracker-mh-xs.jpg", dsk: P + "crossovers-suvs/2026-tracker/mov/01-images/mh/2026-tracker-mh.jpg", mw: 1000, mh: 1500 , pos: "72%" },
     lema: "Tu camino, tu certeza.",
     intro: "Más que una SUV: diseño renovado, conectividad inalámbrica y seguridad activa para llegar más lejos.",
     seo: "Chevrolet Tracker 2026 en Ciudad Victoria desde $425,000. Motor 1.2L Turbo de 130 HP, pantalla HD de 11\" y conectividad inalámbrica. Cotiza con Chevrolet Jebla.",
@@ -159,7 +159,7 @@ export const MODELOS = [
   },
   {
     slug: "trax", nombre: "Trax 2026", corto: "Trax", cat: "suvs", precio: 473300,
-    hero: { mob: P + "crossovers-suvs/2026-trax/mov/01-images/mh/mh-2026-trax-xs.jpg", dsk: P + "crossovers-suvs/2026-trax/mov/01-images/mh/mh-2026-trax.jpg", mw: 1000, mh: 1500 },
+    hero: { mob: P + "crossovers-suvs/2026-trax/mov/01-images/mh/mh-2026-trax-xs.jpg", dsk: P + "crossovers-suvs/2026-trax/mov/01-images/mh/mh-2026-trax.jpg", mw: 1000, mh: 1500 , pos: "85%" },
     lema: "Una SUV tan única como tú.",
     intro: "Tecnología, seguridad y estilo que superan tus expectativas, con OnStar y conectividad inalámbrica.",
     seo: "Chevrolet Trax 2026 en Ciudad Victoria desde $473,300. Motor 1.2L Turbo de 137 HP, OnStar 24/7 y Smartphone Integration inalámbrico. Cotiza con Chevrolet Jebla.",
