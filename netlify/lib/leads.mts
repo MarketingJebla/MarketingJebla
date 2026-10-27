@@ -60,14 +60,16 @@ export function sheetRow(l: Lead) {
 /** Envía un lead al Apps Script del Sheet y marca el resultado en la base. */
 export async function syncToSheet(l: Lead): Promise<boolean> {
   const url = Netlify.env.get("SHEETS_WEBHOOK_URL");
-  if (!url) return false; // aún no configurado: queda pendiente y lo toma el reintento
+  if (!url) { console.warn(`[sheets] ${l.folio}: falta SHEETS_WEBHOOK_URL`); return false; } // queda pendiente para el reintento
   try {
     const res = await fetch(url, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify(sheetRow(l)), redirect: "follow" });
     const txt = await res.text();
     if (!res.ok || !/"ok"\s*:\s*true/.test(txt)) throw new Error(`HTTP ${res.status}: ${txt.slice(0, 200)}`);
     await db.sql`UPDATE leads SET sheet_sync_en = NOW(), sheet_error = NULL, sheet_intentos = sheet_intentos + 1 WHERE folio = ${l.folio}`;
+    console.log(`[sheets] ${l.folio}: copiado`);
     return true;
   } catch (e: any) {
+    console.error(`[sheets] ${l.folio}: error ${String(e?.message || e).slice(0, 300)}`);
     await db.sql`UPDATE leads SET sheet_error = ${String(e?.message || e).slice(0, 500)}, sheet_intentos = sheet_intentos + 1 WHERE folio = ${l.folio}`;
     return false;
   }
