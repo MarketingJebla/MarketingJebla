@@ -115,7 +115,7 @@ ${field("Correo", `<input name="correo" type="email" autocomplete="email" inputm
 function leadForm(o) {
   const step1 = (o.pickModel ? modelField : "") + (o.pre || "") + (o.qualify === false ? "" : qualifyFields);
   return `<div class="card form-card" id="formCard"><form class="lead-form" novalidate data-origen="${o.origen}" data-interes="${o.interes || "cotizacion"}"${o.model ? ` data-modelo="${esc(o.model)}"` : ""}>
-<input type="hidden" name="version"><input type="hidden" name="color">
+<input type="hidden" name="version"><input type="hidden" name="color"><label class="hp" aria-hidden="true">Empresa<input name="empresa" tabindex="-1" autocomplete="off"></label>
 <div class="form-head"><h2 class="h3" data-title>${esc(o.title)}</h2><p class="form-head__sub">${esc(o.sub || "Paso 1 de 2 · Toma menos de 1 minuto")}</p><div class="progress" aria-hidden="true"><span></span></div></div>
 <fieldset class="step is-active" data-step="1"><legend class="sr-only">Paso 1 de 2</legend>${step1}<button type="button" class="btn btn--primary btn--block btn--lg" data-next>Continuar ${ic("arrow")}</button></fieldset>
 <fieldset class="step" data-step="2"><legend class="sr-only">Paso 2 de 2: tus datos</legend>

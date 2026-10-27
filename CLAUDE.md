@@ -27,3 +27,9 @@ Sitio estático de captación de leads para Chevrolet Jebla (Ciudad Victoria, Ta
 - IDs en `TRACKING` de `src/data.mjs`. El sitio solo carga GTM; GA4, Google Ads y el Pixel de Meta viven dentro del contenedor.
 - `node tracking/gtm-container.mjs` genera `tracking/gtm-container.json` para importar en GTM (Combinar → Reemplazar conflictivos).
 - `lead_submit` lleva `event_id` (= folio, para deduplicar con API de Conversiones/CRM) y `user_data` (solo Meta y Google Ads, nunca GA4).
+
+## Leads (base de datos + Google Sheets)
+- El formulario hace POST a `/api/leads` (`netlify/functions/leads.mts`): valida, descarta spam (campo trampa `empresa`) y guarda en **Netlify Database** (tabla `leads`, migraciones en `netlify/database/migrations/`). Esa tabla es la fuente de verdad para el CRM.
+- Copia a Google Sheets: `netlify/lib/leads.mts` → Apps Script (`tracking/apps-script.gs`) cuya URL va en la variable de entorno `SHEETS_WEBHOOK_URL`. `sync-sheets.mts` reintenta pendientes cada 15 min.
+- Cambios de esquema: SIEMPRE con una migración nueva (nunca editar una ya aplicada).
+- El navegador también guarda copia en localStorage (`#leads` para verla).

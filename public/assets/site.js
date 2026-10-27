@@ -1,9 +1,11 @@
 /* Chevrolet Jebla Ciudad Victoria — comportamiento del sitio (funciones DUMMY listas para conectar).
    - Leads: se guardan en el navegador (localStorage "jebla_leads"). Verlos: agrega #leads a cualquier URL.
-   - CRM: define window.JEBLA_CRM_ENDPOINT (o edita CRM abajo) para enviar POST JSON. */
+   - Leads: se envían a /api/leads (Netlify Database + copia en Google Sheets). Respaldo local en localStorage "jebla_leads".
+   - Para mandarlos a otro endpoint (p. ej. el CRM) define window.JEBLA_CRM_ENDPOINT antes de cargar este archivo. */
 (function () {
   "use strict";
-  var CRM = window.JEBLA_CRM_ENDPOINT || null; // PENDIENTE: URL del CRM
+  var CRM = window.JEBLA_CRM_ENDPOINT || "/api/leads";
+  var cookie = function (n) { var m = document.cookie.match(new RegExp("(?:^|; )" + n + "=([^;]*)")); return m ? decodeURIComponent(m[1]) : ""; };
   var D = {}; try { D = JSON.parse(document.getElementById("page-data").textContent); } catch (e) {}
   var $ = function (s, r) { return (r || document).querySelector(s); };
   var $$ = function (s, r) { return Array.prototype.slice.call((r || document).querySelectorAll(s)); };
@@ -151,6 +153,7 @@
       if (form.querySelector('input[name="tiempo"]')) { lead.puntos = pts; lead.calidad = pts >= 4 ? "caliente" : pts >= 2 ? "tibio" : "frío"; }
       if (plan) lead.plan = "Enganche " + plan.pct + "% (" + money(plan.eng) + "), " + plan.plazo + " meses";
       lead.origen = form.dataset.origen; lead.pagina = location.pathname; lead.utm = utm;
+      lead.referrer = document.referrer || ""; lead.fbp = cookie("_fbp"); lead.fbc = cookie("_fbc");
       save(lead).then(function () {
         try { sessionStorage.setItem("jebla_last", JSON.stringify({ nombre: lead.nombre, modelo: lead.modelo, version: lead.version, color: lead.color, folio: lead.folio, interes: lead.interes, plan: lead.plan })); } catch (e) {}
         var dest = "/gracias/?i=" + encodeURIComponent(lead.interes || "cotizacion"), gone = false;
@@ -163,17 +166,26 @@
           eventCallback: leave, eventTimeout: 2000 });
         // Respaldo: si GTM no está cargado (bloqueador, sin ID) no esperamos.
         setTimeout(leave, window.google_tag_manager ? 2200 : 50);
-      }).catch(function () {
+      }).catch(function (err) {
         btn.disabled = false; btn.textContent = TITLES[form.dataset.interes] || "Enviar";
-        alert("No pudimos enviar tu solicitud. Intenta de nuevo o escríbenos por WhatsApp.");
+        track("lead_error", { origen: form.dataset.origen, motivo: (err && err.message) || "red" });
+        alert((err && err.message) || "No pudimos enviar tu solicitud. Intenta de nuevo o escríbenos por WhatsApp.");
       });
     });
 
+    // Guarda el lead en el servidor (2 intentos). El mismo folio evita duplicados si el primer intento sí llegó.
     function save(lead) {
       var all = []; try { all = JSON.parse(localStorage.getItem("jebla_leads") || "[]"); } catch (e) {}
       all.push(lead); try { localStorage.setItem("jebla_leads", JSON.stringify(all)); } catch (e) {}
-      if (CRM) return fetch(CRM, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(lead) }).then(function (r) { if (!r.ok) throw r; });
-      return new Promise(function (res) { setTimeout(res, 600); });
+      var send = function () {
+        return fetch(CRM, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(lead) }).then(function (r) {
+          if (r.ok) return r.json();
+          return r.json().catch(function () { return {}; }).then(function (b) {
+            var e = new Error(r.status === 422 && b.error ? b.error : ""); e.status = r.status; throw e;
+          });
+        });
+      };
+      return send().catch(function (e) { if (e.status === 422) throw e; return new Promise(function (ok) { setTimeout(ok, 1200); }).then(send); });
     }
 
     // Botones que llevan al formulario con datos precargados

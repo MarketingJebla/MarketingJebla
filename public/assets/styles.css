@@ -554,3 +554,6 @@ a.mcard__img{display:grid}
 .mhero__grid>*{min-width:0}
 .mhero__grid{grid-template-columns:minmax(0,1fr)}
 @media (min-width:960px){.mhero__grid{grid-template-columns:minmax(320px,0.8fr) 1.2fr}}
+
+/* Campo trampa antispam: invisible para personas */
+.hp{position:absolute!important;left:-9999px!important;width:1px;height:1px;overflow:hidden}

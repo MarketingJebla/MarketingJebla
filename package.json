@@ -1,0 +1,16 @@
+{
+  "name": "chevrolet-jebla-victoria",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "node build.mjs"
+  },
+  "dependencies": {
+    "@netlify/database": "^2.0.1"
+  },
+  "devDependencies": {
+    "@netlify/database-dev": "^1.0.1",
+    "@netlify/functions": "^6.0.3",
+    "esbuild": "^0.28.2"
+  }
+}
