@@ -13,6 +13,17 @@ export const SITE = {
   logo: "/content/dam/chevrolet/global/us/english/primary-navigation-icons/chevrolet-logo-TLD.png",
 };
 
+// Medición y publicidad. El sitio solo carga Google Tag Manager; GA4, Google Ads y Meta se configuran DENTRO de GTM.
+// Tras cambiar algo aquí: `node build.mjs` (sitio) y `node tracking/gtm-container.mjs` (contenedor para importar en GTM).
+export const TRACKING = {
+  gtm: "",                     // PENDIENTE: ID del contenedor GTM (GTM-XXXXXXX). Vacío = no se carga ningún tag.
+  ga4: "",                       // PENDIENTE: ID de medición GA4 (G-XXXXXXXXXX)
+  googleAds: "",                 // PENDIENTE: ID de conversión de Google Ads (AW-XXXXXXXXXX)
+  adsLabelLead: "",              // PENDIENTE: etiqueta de la conversión "Lead formulario"
+  adsLabelContacto: "",          // PENDIENTE (opcional): etiqueta de la conversión "Clic llamada / WhatsApp"
+  metaPixel: "1191007982740078", // Conjunto de datos "Chevrolet Jebla Motors" (BM Chevrolet Jebla Motors Ciudad Victoria)
+};
+
 export const DEALER = {
   nombre: "Chevrolet Jebla Ciudad Victoria",
   corto: "Chevrolet Jebla",

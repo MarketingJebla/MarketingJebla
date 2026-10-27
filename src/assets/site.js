@@ -21,6 +21,11 @@
   document.addEventListener("click", function (e) {
     var el = e.target.closest("[data-cta]");
     if (el) track("cta_click", { cta: el.getAttribute("data-cta") });
+    // Intención de contacto (conversiones secundarias en Meta / Google Ads)
+    var a = e.target.closest("a[href]"); if (!a) return;
+    var h = a.getAttribute("href"), where = el ? el.getAttribute("data-cta") : "";
+    if (h.indexOf("tel:") === 0) track("click_call", { cta: where, telefono_destino: h.slice(4) });
+    else if (/wa\.me|whatsapp\.com/.test(h)) track("click_whatsapp", { cta: where });
   });
 
   // ---------- Menú móvil ----------
@@ -147,9 +152,17 @@
       if (plan) lead.plan = "Enganche " + plan.pct + "% (" + money(plan.eng) + "), " + plan.plazo + " meses";
       lead.origen = form.dataset.origen; lead.pagina = location.pathname; lead.utm = utm;
       save(lead).then(function () {
-        track("lead_submit", { interes: lead.interes, modelo: lead.modelo, version: lead.version || "", tiempo: lead.tiempo || "", enganche: lead.enganche || "", calidad: lead.calidad || "", origen: lead.origen });
         try { sessionStorage.setItem("jebla_last", JSON.stringify({ nombre: lead.nombre, modelo: lead.modelo, version: lead.version, color: lead.color, folio: lead.folio, interes: lead.interes, plan: lead.plan })); } catch (e) {}
-        location.href = "/gracias/?i=" + encodeURIComponent(lead.interes || "cotizacion");
+        var dest = "/gracias/?i=" + encodeURIComponent(lead.interes || "cotizacion"), gone = false;
+        var leave = function () { if (!gone) { gone = true; location.href = dest; } };
+        // event_id = folio → sirve para deduplicar con la API de Conversiones de Meta / CRM.
+        // user_data solo lo usan Meta (coincidencia avanzada) y Google Ads (conversiones mejoradas); GA4 no lo recibe.
+        window.dataLayer.push({ user_data: null });
+        track("lead_submit", { event_id: lead.folio, interes: lead.interes, modelo: lead.modelo, version: lead.version || "", tiempo: lead.tiempo || "", enganche: lead.enganche || "", calidad: lead.calidad || "", origen: lead.origen,
+          user_data: { email: (lead.correo || "").trim().toLowerCase(), phone_number: lead.telefono ? "+52" + lead.telefono : "", first_name: (lead.nombre || "").trim().split(/\s+/)[0] || "" },
+          eventCallback: leave, eventTimeout: 2000 });
+        // Respaldo: si GTM no está cargado (bloqueador, sin ID) no esperamos.
+        setTimeout(leave, window.google_tag_manager ? 2200 : 50);
       }).catch(function () {
         btn.disabled = false; btn.textContent = TITLES[form.dataset.interes] || "Enviar";
         alert("No pudimos enviar tu solicitud. Intenta de nuevo o escríbenos por WhatsApp.");

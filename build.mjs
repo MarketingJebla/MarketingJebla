@@ -1,6 +1,6 @@
 // Generador estático del sitio. Uso: node build.mjs  →  escribe /public
 import { mkdirSync, writeFileSync, rmSync, cpSync, existsSync } from "node:fs";
-import { SITE, DEALER, MUNICIPIOS, INTERESES, MODELOS, PORTAFOLIO, CATEGORIAS, HERO_HOME, TIEMPOS, ENGANCHES } from "./src/data.mjs";
+import { SITE, DEALER, MUNICIPIOS, INTERESES, MODELOS, PORTAFOLIO, CATEGORIAS, HERO_HOME, TIEMPOS, ENGANCHES, TRACKING } from "./src/data.mjs";
 
 const OUT = "public";
 rmSync(OUT, { recursive: true, force: true });
@@ -30,6 +30,13 @@ const crumbsLD = items => ({ "@context": "https://schema.org", "@type": "Breadcr
   itemListElement: items.map((c, i) => ({ "@type": "ListItem", position: i + 1, name: c[0], item: abs(c[1]) || undefined })) });
 const faqLD = faq => ({ "@context": "https://schema.org", "@type": "FAQPage",
   mainEntity: faq.map(([q, a]) => ({ "@type": "Question", name: q, acceptedAnswer: { "@type": "Answer", text: a } })) });
+
+// ---------- Google Tag Manager (GA4, Google Ads y Meta viven dentro del contenedor) ----------
+// Eventos en dataLayer: cta_click, click_call, click_whatsapp, form_start, form_step, form_error, lead_submit, color_select, version_select, estimator_use, category_view
+const G = TRACKING.gtm;
+const gtmHead = G ? `
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','${G}');</script>` : "";
+const gtmBody = G ? `<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=${G}" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>` : "";
 
 // ---------- piezas comunes ----------
 const NAV = [["/modelos/", "Modelos"], ["/promociones/", "Promociones"], ["/financiamiento/", "Financiamiento"], ["/seminuevos/", "Auto a cuenta"], ["/servicio/", "Servicio"], ["/contacto/", "Contacto"]];
@@ -73,10 +80,9 @@ function page({ path, title, desc, body, ld = [], ogImage, data = {}, noindex = 
 <meta property="og:title" content="${esc(title)}"><meta property="og:description" content="${esc(desc)}">${ogImage ? `<meta property="og:image" content="${ogImage}">` : ""}
 <meta name="twitter:card" content="summary_large_image"><meta name="theme-color" content="#1a1a1a">
 <link rel="icon" href="${img(SITE.logo)}"><link rel="preconnect" href="${SITE.cdn}"><link rel="stylesheet" href="/assets/styles.css">
-<script>window.dataLayer=window.dataLayer||[];</script>
-<!-- TRACKING (PENDIENTE): insertar Google Tag Manager / Meta Pixel aquí. Eventos en dataLayer: cta_click, form_start, form_step, form_error, lead_submit, color_select, version_select, estimator_use -->
+<script>window.dataLayer=window.dataLayer||[];</script>${gtmHead}
 ${[dealerLD(), ...ld].map(o => `<script type="application/ld+json">${JSON.stringify(o)}</script>`).join("")}
-</head><body>
+</head><body>${gtmBody}
 <a class="skip" href="#cotizar">Ir al formulario</a>
 ${SITE.preview ? `<div class="pbar">VERSIÓN DE PRUEBA · No oficial</div>` : ""}
 ${header(path)}

@@ -22,3 +22,8 @@ Sitio estático de captación de leads para Chevrolet Jebla (Ciudad Victoria, Ta
 - Formularios de ventas (función `leadForm`): paso 1 = tiempo para estrenar + enganche estimado (y selector de modelo donde no se conoce); paso 2 = nombre completo, WhatsApp y correo. Opciones y puntos en `TIEMPOS`/`ENGANCHES` de `src/data.mjs`; cada lead lleva `calidad` caliente/tibio/frío. El formulario de servicio no lleva calificación.
 - Mantener el aviso de privacidad en todo formulario (línea de texto con enlace bajo el botón).
 - Mientras `SITE.preview` sea `true`, el sitio no se indexa (franja "Versión de prueba" + noindex).
+
+## Medición (GTM, GA4, Google Ads, Meta)
+- IDs en `TRACKING` de `src/data.mjs`. El sitio solo carga GTM; GA4, Google Ads y el Pixel de Meta viven dentro del contenedor.
+- `node tracking/gtm-container.mjs` genera `tracking/gtm-container.json` para importar en GTM (Combinar → Reemplazar conflictivos).
+- `lead_submit` lleva `event_id` (= folio, para deduplicar con API de Conversiones/CRM) y `user_data` (solo Meta y Google Ads, nunca GA4).
