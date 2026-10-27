@@ -24,8 +24,8 @@ constant("CONST - Meta Pixel ID", T.metaPixel);
 [["event_id", "event_id"], ["interes", "interes"], ["modelo", "modelo"], ["version", "version"], ["calidad", "calidad"], ["tiempo", "tiempo"],
  ["enganche", "enganche"], ["origen", "origen"], ["cta", "cta"], ["pagina", "pagina"], ["email", "user_data.email"],
  ["telefono", "user_data.phone_number"], ["nombre", "user_data.first_name"]].forEach(([n, k]) => dlv("DLV - " + n, k));
-// Datos del usuario para conversiones mejoradas de Google Ads
-variables.push({ ...A, variableId: String(++vid), name: "UPD - Datos del lead", type: "awec", parameter: [
+// Datos del usuario para conversiones mejoradas de Google Ads (solo cuando hay conversión de Ads)
+if (T.googleAds && T.adsLabelLead) variables.push({ ...A, variableId: String(++vid), name: "UPD - Datos del lead", type: "awec", parameter: [
   tpl("mode", "MANUAL"), tpl("email", "{{DLV - email}}"), tpl("phone_number", "{{DLV - telefono}}"), tpl("first_name", "{{DLV - nombre}}")] });
 
 // ---------- Activadores ----------
@@ -47,7 +47,7 @@ const tag = (name, type, parameter, firing, extra = {}) => tags.push({ ...A, tag
 const html = code => [tpl("html", code), bool("supportDocumentWrite", false)];
 const ga4Event = (name, event, params, trig) => tag(name, "gaawe", [
   bool("sendEcommerceData", false), tpl("eventName", event), tpl("measurementIdOverride", "{{CONST - GA4 ID}}"),
-  { type: "LIST", key: "eventSettingsTable", list: params.map(([k, v]) => ({ type: "MAP", map: [tpl("parameter", k), tpl("parameterValue", v)] })) },
+  ...(params.length ? [{ type: "LIST", key: "eventSettingsTable", list: params.map(([k, v]) => ({ type: "MAP", map: [tpl("parameter", k), tpl("parameterValue", v)] })) }] : []),
 ], trig);
 
 // Google: etiqueta de Google (GA4), vinculador de conversiones, eventos y conversiones de Ads
@@ -69,8 +69,9 @@ const awct = (name, label, trig, orderId) => tag(name, "awct", [
   bool("enableNewCustomerReporting", false), bool("enableShippingData", false), bool("rdp", false),
   ...(orderId ? [bool("enableEnhancedConversion", true), tpl("cssProvidedEnhancedConversionValue", "{{UPD - Datos del lead}}")] : []),
 ], trig);
-awct("Google Ads - Conversión Lead formulario", "{{CONST - Ads label Lead}}", [TR.lead_submit], "{{DLV - event_id}}");
-awct("Google Ads - Conversión Llamada / WhatsApp", "{{CONST - Ads label Contacto}}", [TR.click_call, TR.click_whatsapp]);
+// Las conversiones de Ads solo se incluyen cuando ya existen sus IDs (evita etiquetas que fallen).
+if (T.googleAds && T.adsLabelLead) awct("Google Ads - Conversión Lead formulario", "{{CONST - Ads label Lead}}", [TR.lead_submit], "{{DLV - event_id}}");
+if (T.googleAds && T.adsLabelContacto) awct("Google Ads - Conversión Llamada / WhatsApp", "{{CONST - Ads label Contacto}}", [TR.click_call, TR.click_whatsapp]);
 
 // Meta Pixel
 tag("Meta - Pixel base (PageView)", "html", html(`<script>

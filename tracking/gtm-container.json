@@ -1,6 +1,6 @@
 {
   "exportFormatVersion": 2,
-  "exportTime": "2026-10-27 21:01:37",
+  "exportTime": "2026-10-27 21:51:06",
   "containerVersion": {
     "path": "accounts/0/containers/0/versions/0",
     "accountId": "0",
@@ -11,7 +11,7 @@
       "accountId": "0",
       "containerId": "0",
       "name": "Chevrolet Jebla Victoria",
-      "publicId": "GTM-XXXXXXX",
+      "publicId": "GTM-N7CRH7MQ",
       "usageContext": [
         "WEB"
       ]
@@ -385,11 +385,6 @@
             "type": "TEMPLATE",
             "key": "measurementIdOverride",
             "value": "{{CONST - GA4 ID}}"
-          },
-          {
-            "type": "LIST",
-            "key": "eventSettingsTable",
-            "list": []
           }
         ],
         "firingTriggerId": [
@@ -418,11 +413,6 @@
             "type": "TEMPLATE",
             "key": "measurementIdOverride",
             "value": "{{CONST - GA4 ID}}"
-          },
-          {
-            "type": "LIST",
-            "key": "eventSettingsTable",
-            "list": []
           }
         ],
         "firingTriggerId": [
@@ -451,11 +441,6 @@
             "type": "TEMPLATE",
             "key": "measurementIdOverride",
             "value": "{{CONST - GA4 ID}}"
-          },
-          {
-            "type": "LIST",
-            "key": "eventSettingsTable",
-            "list": []
           }
         ],
         "firingTriggerId": [
@@ -467,128 +452,6 @@
         "accountId": "0",
         "containerId": "0",
         "tagId": "210",
-        "name": "Google Ads - Conversión Lead formulario",
-        "type": "awct",
-        "parameter": [
-          {
-            "type": "TEMPLATE",
-            "key": "conversionId",
-            "value": "{{CONST - Google Ads ID}}"
-          },
-          {
-            "type": "TEMPLATE",
-            "key": "conversionLabel",
-            "value": "{{CONST - Ads label Lead}}"
-          },
-          {
-            "type": "TEMPLATE",
-            "key": "orderId",
-            "value": "{{DLV - event_id}}"
-          },
-          {
-            "type": "TEMPLATE",
-            "key": "currencyCode",
-            "value": "MXN"
-          },
-          {
-            "type": "BOOLEAN",
-            "key": "enableConversionLinker",
-            "value": "true"
-          },
-          {
-            "type": "BOOLEAN",
-            "key": "enableProductReporting",
-            "value": "false"
-          },
-          {
-            "type": "BOOLEAN",
-            "key": "enableNewCustomerReporting",
-            "value": "false"
-          },
-          {
-            "type": "BOOLEAN",
-            "key": "enableShippingData",
-            "value": "false"
-          },
-          {
-            "type": "BOOLEAN",
-            "key": "rdp",
-            "value": "false"
-          },
-          {
-            "type": "BOOLEAN",
-            "key": "enableEnhancedConversion",
-            "value": "true"
-          },
-          {
-            "type": "TEMPLATE",
-            "key": "cssProvidedEnhancedConversionValue",
-            "value": "{{UPD - Datos del lead}}"
-          }
-        ],
-        "firingTriggerId": [
-          "101"
-        ],
-        "tagFiringOption": "ONCE_PER_EVENT"
-      },
-      {
-        "accountId": "0",
-        "containerId": "0",
-        "tagId": "211",
-        "name": "Google Ads - Conversión Llamada / WhatsApp",
-        "type": "awct",
-        "parameter": [
-          {
-            "type": "TEMPLATE",
-            "key": "conversionId",
-            "value": "{{CONST - Google Ads ID}}"
-          },
-          {
-            "type": "TEMPLATE",
-            "key": "conversionLabel",
-            "value": "{{CONST - Ads label Contacto}}"
-          },
-          {
-            "type": "TEMPLATE",
-            "key": "currencyCode",
-            "value": "MXN"
-          },
-          {
-            "type": "BOOLEAN",
-            "key": "enableConversionLinker",
-            "value": "true"
-          },
-          {
-            "type": "BOOLEAN",
-            "key": "enableProductReporting",
-            "value": "false"
-          },
-          {
-            "type": "BOOLEAN",
-            "key": "enableNewCustomerReporting",
-            "value": "false"
-          },
-          {
-            "type": "BOOLEAN",
-            "key": "enableShippingData",
-            "value": "false"
-          },
-          {
-            "type": "BOOLEAN",
-            "key": "rdp",
-            "value": "false"
-          }
-        ],
-        "firingTriggerId": [
-          "102",
-          "103"
-        ],
-        "tagFiringOption": "ONCE_PER_EVENT"
-      },
-      {
-        "accountId": "0",
-        "containerId": "0",
-        "tagId": "212",
         "name": "Meta - Pixel base (PageView)",
         "type": "html",
         "parameter": [
@@ -616,7 +479,7 @@
       {
         "accountId": "0",
         "containerId": "0",
-        "tagId": "213",
+        "tagId": "211",
         "name": "Meta - Lead",
         "type": "html",
         "parameter": [
@@ -639,7 +502,7 @@
       {
         "accountId": "0",
         "containerId": "0",
-        "tagId": "214",
+        "tagId": "212",
         "name": "Meta - Contact (llamada / WhatsApp)",
         "type": "html",
         "parameter": [
@@ -842,7 +705,7 @@
           {
             "type": "TEMPLATE",
             "key": "value",
-            "value": "G-XXXXXXXXXX"
+            "value": "G-70X945VE3C"
           }
         ]
       },
@@ -1276,35 +1139,6 @@
             "type": "TEMPLATE",
             "key": "name",
             "value": "user_data.first_name"
-          }
-        ]
-      },
-      {
-        "accountId": "0",
-        "containerId": "0",
-        "variableId": "19",
-        "name": "UPD - Datos del lead",
-        "type": "awec",
-        "parameter": [
-          {
-            "type": "TEMPLATE",
-            "key": "mode",
-            "value": "MANUAL"
-          },
-          {
-            "type": "TEMPLATE",
-            "key": "email",
-            "value": "{{DLV - email}}"
-          },
-          {
-            "type": "TEMPLATE",
-            "key": "phone_number",
-            "value": "{{DLV - telefono}}"
-          },
-          {
-            "type": "TEMPLATE",
-            "key": "first_name",
-            "value": "{{DLV - nombre}}"
           }
         ]
       }
