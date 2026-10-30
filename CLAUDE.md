@@ -33,3 +33,8 @@ Sitio estático de captación de leads para Chevrolet Jebla (Ciudad Victoria, Ta
 - Copia a Google Sheets: `netlify/lib/leads.mts` → Apps Script (`tracking/apps-script.gs`) cuya URL va en la variable de entorno `SHEETS_WEBHOOK_URL`. `sync-sheets.mts` reintenta pendientes cada 15 min.
 - Cambios de esquema: SIEMPRE con una migración nueva (nunca editar una ya aplicada).
 - El navegador también guarda copia en localStorage (`#leads` para verla).
+
+## CRM
+- API para el CRM en `netlify/functions/crm-api.mts` (`/api/crm/*`, llave `CRM_API_KEY`). Contrato completo en `docs/integracion-crm.md`: cualquier cambio a campos o rutas se refleja ahí.
+- Webhook opcional al CRM (`CRM_WEBHOOK_URL` + `CRM_WEBHOOK_SECRET`, firma HMAC); reintento en `sync-sheets.mts`.
+- Leads de prueba (`nombre` "PRUEBA…" o `utm_source=prueba`) se marcan `es_prueba` y se excluyen de la API por defecto.

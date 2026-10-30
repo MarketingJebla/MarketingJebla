@@ -1,9 +1,16 @@
-// Reintento programado: copia al Google Sheet los leads que no se pudieron enviar al momento.
+// Reintento programado: copia al Google Sheet (y al webhook del CRM, si existe) los leads que no se pudieron enviar al momento.
 // Corre cada 15 minutos (UTC; la hora local no importa para este intervalo).
 import type { Config } from "@netlify/functions";
-import { db, syncToSheet } from "../lib/leads.mts";
+import { db, syncToSheet, syncToCrm } from "../lib/leads.mts";
 
 export default async () => {
+  if (Netlify.env.get("CRM_WEBHOOK_URL")) {
+    const crm = await db.sql`
+      SELECT * FROM leads WHERE crm_sync_en IS NULL AND crm_intentos < 20 AND creado_en > NOW() - INTERVAL '14 days'
+      ORDER BY creado_en ASC LIMIT 25`;
+    let n = 0; for (const l of crm) if (await syncToCrm(l)) n++;
+    if (crm.length) console.log(`sync: ${n}/${crm.length} leads entregados al CRM`);
+  }
   if (!Netlify.env.get("SHEETS_WEBHOOK_URL")) return;
   const pendientes = await db.sql`
     SELECT * FROM leads
